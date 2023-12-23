@@ -169,15 +169,19 @@ h1,h2,h3,h4,h5
 /* end simpletextrotator */
 
 /* start home */       
+/* start home */       
 #home
-	{
-        background: url('../images/v3.png');
-        background-size: cover;
-        background-repeat: no-repeat;
-        padding-top: 130px;
-        padding-bottom: 90px;
-        text-align: center;
-	}
+{
+    background: url('../images/v3.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    padding-top: 130px;
+    padding-bottom: 90px;
+    text-align: center;
+}
+
+/* Media query for mobile devices */
+
 #home h1
     {
         border: 2px solid #D43F52;
