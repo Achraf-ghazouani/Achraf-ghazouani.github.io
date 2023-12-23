@@ -168,16 +168,29 @@ h1,h2,h3,h4,h5
 }
 /* end simpletextrotator */
 
+
+.profile-photo {
+    width: 150px; /* Adjust as needed */
+    height: 150px; /* Adjust as needed */
+    border-radius: 50%; /* Makes the photo circular */
+    object-fit: cover; /* Ensures the aspect ratio of the photo is maintained */
+    margin-right: 20px; /* Adds some space between the photo and the text */
+    float: left; /* Positions the photo to the left */
+}
+
+
 /* start home */       
 /* start home */       
 #home
 {
-    background: url('../images/v3.png');
+    background: url('../images/3145534.jpg');
     background-size: cover;
     background-repeat: no-repeat;
     padding-top: 130px;
-    padding-bottom: 90px;
+    padding-bottom: 150px;
     text-align: center;
+    max-width: 100%;
+    height: auto;
 }
 
 /* Media query for mobile devices */
@@ -204,7 +217,7 @@ h1,h2,h3,h4,h5
         font-weight: bold;
         width: 180px;
         height: 60px;
-        margin-top: 400px;
+        margin-top: 70px;
         padding-top: 18px;
         transition: all 0.4s ease-in-out;
     }
