@@ -1,8 +1,8 @@
 /*
 
-Lavish HTML CSS Template
 
-https://templatemo.com/tm-458-lavish
+
+
 		
 */
 
@@ -171,11 +171,11 @@ h1,h2,h3,h4,h5
 /* start home */       
 #home
 	{
-        background: url('../images/home-bg.jpg');
+        background: url('../images/v3.png');
         background-size: cover;
         background-repeat: no-repeat;
-        padding-top: 120px;
-        padding-bottom: 140px;
+        padding-top: 130px;
+        padding-bottom: 90px;
         text-align: center;
 	}
 #home h1
@@ -200,7 +200,7 @@ h1,h2,h3,h4,h5
         font-weight: bold;
         width: 180px;
         height: 60px;
-        margin-top: 40px;
+        margin-top: 400px;
         padding-top: 18px;
         transition: all 0.4s ease-in-out;
     }
