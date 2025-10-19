@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Mode Diagnostic Tool</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .diagnostic-panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #6366f1;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #6366f1;
+            margin-top: 20px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .status.pass {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.fail {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        button {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #4f46e5;
+        }
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .output {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="diagnostic-panel">
+        <h1>🔍 Dark Mode Diagnostic Tool</h1>
+        
+        <h2>1. Environment Check</h2>
+        <div id="envCheck"></div>
+        
+        <h2>2. Theme State</h2>
+        <div id="themeState"></div>
+        
+        <h2>3. localStorage Data</h2>
+        <div id="localStorage"></div>
+        
+        <h2>4. CSS Variables</h2>
+        <div id="cssVars"></div>
+        
+        <h2>5. Actions</h2>
+        <div class="button-group">
+            <button onclick="testLightMode()">Force Light Mode</button>
+            <button onclick="testDarkMode()">Force Dark Mode</button>
+            <button onclick="clearTheme()">Clear Theme Preference</button>
+            <button onclick="testThemeToggle()">Test Theme Toggle</button>
+            <button onclick="runFullDiagnostic()">Run Full Diagnostic</button>
+        </div>
+        
+        <h2>6. Results</h2>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const resultsDiv = document.getElementById('results');
+        
+        function log(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = `status ${type}`;
+            entry.textContent = message;
+            resultsDiv.appendChild(entry);
+        }
+        
+        function clearResults() {
+            resultsDiv.innerHTML = '';
+        }
+        
+        function getThemeState() {
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            const savedTheme = localStorage.getItem('theme');
+            const htmlAttr = document.documentElement.getAttribute('data-theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            return {
+                isDarkMode,
+                savedTheme,
+                htmlAttr,
+                prefersDark
+            };
+        }
+        
+        function updateDiagnostics() {
+            // Environment
+            const envHtml = `
+                <div class="status pass">✓ JavaScript enabled</div>
+                <div class="status ${localStorage ? 'pass' : 'fail'}">
+                    ${localStorage ? '✓ localStorage available' : '✗ localStorage not available'}
+                </div>
+                <div class="status pass">✓ Browser: ${navigator.userAgent.split(' ').slice(-2).join(' ')}</div>
+            `;
+            document.getElementById('envCheck').innerHTML = envHtml;
+            
+            // Theme State
+            const state = getThemeState();
+            const themeHtml = `
+                <div class="status ${state.isDarkMode ? 'fail' : 'pass'}">
+                    Dark Mode Class: ${state.isDarkMode ? 'ACTIVE (dark-mode)' : 'INACTIVE (light mode)'}
+                </div>
+                <div class="status info">
+                    Saved Preference: ${state.savedTheme || 'None (will use system setting)'}
+                </div>
+                <div class="status info">
+                    HTML data-theme: ${state.htmlAttr || 'Not set'}
+                </div>
+                <div class="status info">
+                    System Prefers Dark: ${state.prefersDark ? 'Yes' : 'No'}
+                </div>
+            `;
+            document.getElementById('themeState').innerHTML = themeHtml;
+            
+            // localStorage
+            const localStorageHtml = `
+                <div class="output">theme: "${state.savedTheme || '(not set)'}"</div>
+                <button onclick="copyLocalStorage()">Copy all localStorage</button>
+            `;
+            document.getElementById('localStorage').innerHTML = localStorageHtml;
+            
+            // CSS Variables
+            const root = getComputedStyle(document.documentElement);
+            const bgPrimary = root.getPropertyValue('--bg-primary').trim();
+            const textPrimary = root.getPropertyValue('--text-primary').trim();
+            const cssVarsHtml = `
+                <div class="output">--bg-primary: ${bgPrimary}
+--text-primary: ${textPrimary}</div>
+            `;
+            document.getElementById('cssVars').innerHTML = cssVarsHtml;
+        }
+        
+        function testLightMode() {
+            clearResults();
+            log('Setting light mode...', 'info');
+            document.body.classList.remove('dark-mode');
+            document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.setItem('theme', 'light');
+            log('✓ Light mode applied', 'pass');
+            log('Check the page - it should be in light mode now', 'pass');
+            setTimeout(updateDiagnostics, 300);
+        }
+        
+        function testDarkMode() {
+            clearResults();
+            log('Setting dark mode...', 'info');
+            document.body.classList.add('dark-mode');
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem('theme', 'dark');
+            log('✓ Dark mode applied', 'pass');
+            log('Check the page - it should be in dark mode now', 'pass');
+            setTimeout(updateDiagnostics, 300);
+        }
+        
+        function clearTheme() {
+            clearResults();
+            localStorage.removeItem('theme');
+            log('✓ Theme preference cleared', 'pass');
+            log('Page will now use system preference on reload', 'info');
+            updateDiagnostics();
+        }
+        
+        function testThemeToggle() {
+            clearResults();
+            const themeToggle = document.querySelector('#themeToggle');
+            if (!themeToggle) {
+                log('✗ Theme toggle button not found', 'fail');
+                return;
+            }
+            log('✓ Theme toggle button found', 'pass');
+            log('Simulating click...', 'info');
+            themeToggle.click();
+            log('✓ Click simulated', 'pass');
+            setTimeout(updateDiagnostics, 300);
+        }
+        
+        function copyLocalStorage() {
+            const data = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                data.push(`${key}: "${localStorage.getItem(key)}"`);
+            }
+            const text = data.join('\n') || '(empty)';
+            navigator.clipboard.writeText(text).then(() => {
+                log('✓ localStorage copied to clipboard', 'pass');
+            }).catch(err => {
+                log('✗ Failed to copy: ' + err, 'fail');
+            });
+        }
+        
+        function runFullDiagnostic() {
+            clearResults();
+            const state = getThemeState();
+            
+            log('=== FULL DIAGNOSTIC REPORT ===', 'info');
+            log('');
+            
+            // 1. Check elements
+            log('1. DOM Elements Check:', 'info');
+            const themeToggle = document.querySelector('#themeToggle');
+            const body = document.body;
+            const html = document.documentElement;
+            
+            log(themeToggle ? '✓ Theme toggle button exists' : '✗ Theme toggle button missing', 
+                themeToggle ? 'pass' : 'fail');
+            log(body ? '✓ Body element exists' : '✗ Body element missing', 
+                body ? 'pass' : 'fail');
+            log(html ? '✓ HTML element exists' : '✗ HTML element missing', 
+                html ? 'pass' : 'fail');
+            log('');
+            
+            // 2. CSS Variables
+            log('2. CSS Variables Check:', 'info');
+            const root = getComputedStyle(document.documentElement);
+            const bgPrimary = root.getPropertyValue('--bg-primary').trim();
+            const textPrimary = root.getPropertyValue('--text-primary').trim();
+            const bgPrimaryDark = '#0f172a';
+            const bgPrimaryLight = '#ffffff';
+            
+            const currentBg = bgPrimary;
+            const isDarkCSS = currentBg === bgPrimaryDark;
+            const isLightCSS = currentBg.includes('255') || currentBg === 'rgb(255, 255, 255)';
+            
+            log(`Current --bg-primary: ${bgPrimary}`, 'info');
+            log(`Expected light: ${bgPrimaryLight}`, isDarkMode ? 'fail' : 'pass');
+            log(`Expected dark: ${bgPrimaryDark}`, isDarkMode ? 'pass' : 'fail');
+            log('');
+            
+            // 3. Theme State
+            log('3. Theme State Check:', 'info');
+            log(`Dark Mode Class Active: ${state.isDarkMode ? 'YES' : 'NO'}`, 
+                state.isDarkMode ? 'info' : 'info');
+            log(`Saved Preference: ${state.savedTheme || 'None'}`, 'info');
+            log(`System Prefers Dark: ${state.prefersDark ? 'Yes' : 'No'}`, 'info');
+            log('');
+            
+            // 4. Consistency Check
+            log('4. Consistency Check:', 'info');
+            const consistent = state.isDarkMode === (state.savedTheme === 'dark' || (state.savedTheme === null && state.prefersDark));
+            log(consistent ? '✓ Theme state is consistent' : '✗ Theme state is inconsistent', 
+                consistent ? 'pass' : 'fail');
+            log('');
+            
+            // 5. Recommendations
+            log('5. Recommendations:', 'info');
+            if (state.savedTheme === null && !state.prefersDark && !state.isDarkMode) {
+                log('✓ Everything looks good! Page should load in light mode.', 'pass');
+            } else if (state.savedTheme === 'light' && !state.isDarkMode) {
+                log('✓ Light mode saved and applied correctly.', 'pass');
+            } else if (state.savedTheme === 'dark' && state.isDarkMode) {
+                log('✓ Dark mode saved and applied correctly.', 'pass');
+            } else if (!state.savedTheme && state.prefersDark && state.isDarkMode) {
+                log('✓ System dark mode detected and applied correctly.', 'pass');
+            } else {
+                log('⚠ There may be an issue with theme detection. Click "Force Light Mode" to test.', 'info');
+            }
+        }
+        
+        // Initial diagnostic
+        document.addEventListener('DOMContentLoaded', updateDiagnostics);
+        updateDiagnostics();
+    </script>
+</body>
+</html>
